@@ -77,16 +77,20 @@ void BrachyDetectorConstructionIr::ConstructIridium(G4VPhysicalVolume* mother)
 
   G4Material* iridiumMat = pMat -> GetMat("gold");
 
+	// Rotation Matrix
+	G4RotationMatrix* rotX = new G4RotationMatrix();
+	rotX->rotateX(M_PI/2*rad);
+
   // Iridium core
   iridiumCore = new G4Tubs("IrCore",0,0.25*mm,5.*mm,0.*deg,360.*deg);
   iridiumCoreLog = new G4LogicalVolume(iridiumCore,
                                        iridiumMat,
                                        "IridiumCoreLog");
-  iridiumCorePhys = new G4PVPlacement(0,
+  iridiumCorePhys = new G4PVPlacement(rotX,
                                       G4ThreeVector(),
                                       "IridiumCorePhys",
                                       iridiumCoreLog,
-                                      capsulePhys,
+                                      mother,
                                       false,
                                       0);
 

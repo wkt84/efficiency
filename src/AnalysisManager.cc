@@ -63,7 +63,7 @@ AnalysisManager* AnalysisManager::instance = 0;
 AnalysisManager::AnalysisManager() : 
 hist(0), h_ini(0)
 {
-  gROOT->Reset();
+//  gROOT->Reset();
   // Instantiate the factories
   // The factories manage the analysis objects
 //  aFact = AIDA_createAnalysisFactory();
@@ -95,7 +95,7 @@ AnalysisManager* AnalysisManager::getInstance()
 void AnalysisManager::book() 
 { 
   // Instantiate the histogram and ntuple factories
-  hist = new TH1F("h1", "Deposit Energy", 500, 0, 5);
+  hist = new TH1F("h1", "Deposit Energy", 2000, 0, 2000);
 	hist->GetXaxis()->SetTitle("Deposit Energy (keV)");
 
 	h_ini = new TH1F("h2", "Initial Spectrum", 600, 0, 1200);

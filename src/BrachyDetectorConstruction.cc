@@ -44,6 +44,8 @@
 #include "G4Box.hh"
 #include "G4Sphere.hh"
 #include "G4Tubs.hh"
+#include "G4UnionSolid.hh"
+#include "G4SubtractionSolid.hh"
 #include "G4LogicalVolume.hh"
 #include "G4ThreeVector.hh"
 #include "G4PVPlacement.hh"
@@ -66,8 +68,7 @@
 BrachyDetectorConstruction::BrachyDetectorConstruction(G4String &SDName)
 : detectorChoice(0), phantomSD(0), phantomROGeometry(0), factory(0),
   World(0), WorldLog(0), WorldPhys(0),
-  Phantom(0), PhantomLog(0), PhantomPhys(0),
-  phantomAbsorberMaterial(0), Detector(0), DetectorLog(0), DetectorPhys(0),GRD(0),GRDLog(0),GRDPhys(0)
+  phantomAbsorberMaterial(0), Detector(0), DetectorLog(0), DetectorPhys(0),GRDLog(0),GRDPhys(0)
 {
   // Define half size of the phantom along the x, y, z axis
   phantomSizeX = 15.*cm ;
@@ -148,7 +149,7 @@ void BrachyDetectorConstruction::SwitchBrachytherapicSeed()
       break;
   }
 
-  factory -> CreateSource(PhantomPhys);
+  factory -> CreateSource(WorldPhys);
 
   // Notify run manager that the new geometry has been built
   G4RunManager::GetRunManager() -> DefineWorldVolume( WorldPhys );
@@ -180,7 +181,6 @@ void BrachyDetectorConstruction::SelectBrachytherapicSeed(G4String val)
 
 void BrachyDetectorConstruction::SetBuildupDepth(G4double val)
 {
-	buildup = val;
 }
 
 void BrachyDetectorConstruction::ConstructPhantom()
@@ -193,6 +193,8 @@ void BrachyDetectorConstruction::ConstructPhantom()
 //  G4Material* Water = pMaterial -> GetMat("Water");
 	G4Material* air = pMaterial -> GetMat("Air");
 	G4Material* water = pMaterial -> GetMat("Water");
+	G4Material* Al = pMaterial -> GetMat("Alminium");
+	G4Material* mylar = pMaterial -> GetMat("Mylar");
 
   ComputeDimVoxel();
 
@@ -202,28 +204,40 @@ void BrachyDetectorConstruction::ConstructPhantom()
   WorldPhys = new G4PVPlacement(0,G4ThreeVector(),
                                 "WorldPhys",WorldLog,0,false,0);
 
-  // Buildup Material 
-	buildup = 0.5*cm;
-  Phantom = new G4Tubs("Phantom",49.95*cm-buildup, 50.05*cm+buildup, 0.5*cm+buildup, 0.*deg, 360.*deg);
+	// Alminium cap
+	G4Tubs* Outer = new G4Tubs("Outer", 38.3*mm, 39.3*mm, 97*mm/2, 0.*deg, 360.*deg);
+	G4LogicalVolume *OuterLog = new G4LogicalVolume(Outer, Al, "OuterLog", 0, 0, 0);
+	G4VPhysicalVolume *OuterPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -49.5*mm-0.25*mm), OuterLog, "OuterPhys", WorldLog, false, 0);
 
-  // Logical volume
-  PhantomLog = new G4LogicalVolume(Phantom,water,"PhantomLog",0,0,0);
+	G4Tubs* Upper = new G4Tubs("Upper", 0.*mm, 39.3*mm, 1.*mm/2, 0.*deg, 360.*deg);
+	G4LogicalVolume *UpperLog = new G4LogicalVolume(Upper, Al, "UpperLog", 0, 0, 0);
+	G4VPhysicalVolume *UpperPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -0.5*mm-0.25*mm), UpperLog, "UpperPhys", WorldLog, false, 0);
 
-  // Physical volume
-  PhantomPhys = new G4PVPlacement(0,G4ThreeVector(), // Position: rotation and translation
-                                  "PhantomPhys", // Name
-				  PhantomLog, // Associated logical volume
-                                  WorldPhys, // Mother volume
-				  false,0); 
+	G4Tubs* Inner = new G4Tubs("Inner", 32.5*mm, 33.3*mm, 47.*mm, 0.*deg, 360.*deg);
+	G4LogicalVolume *InnerLog = new G4LogicalVolume(Inner, Al, "InnerLog", 0, 0, 0);
+	G4VPhysicalVolume *InnerPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -47*mm-4.25*mm), InnerLog, "InnerPhys", WorldLog, false, 0);
+
+	G4Tubs* AlCap = new G4Tubs("AlCap", 0.*mm, 33.3*mm, 0.03*mm/2, 0.*deg, 360.*deg);
+	G4LogicalVolume *AlCapLog = new G4LogicalVolume(AlCap, Al, "AlCapLog", 0, 0, 0);
+	G4VPhysicalVolume *AlCapPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -4.25*mm+0.045*mm),AlCapLog, "AlCapPhys", WorldLog, false, 0);
+
+	G4Tubs* MylarCap = new G4Tubs("MylarCap", 0.*mm, 33.3*mm, 0.03*mm/2, 0.*deg, 360.*deg);
+	G4LogicalVolume *MylarCapLog = new G4LogicalVolume(MylarCap, mylar, "MylarCapLog", 0, 0, 0);
+	G4VPhysicalVolume *MylarCapPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -4.25*mm+0.015*mm),MylarCapLog, "MylarCapPhys", WorldLog, false, 0);
 
   WorldLog -> SetVisAttributes (G4VisAttributes::Invisible);
 
   // Visualization attributes of the phantom
   G4VisAttributes* simpleBoxVisAtt = new G4VisAttributes(lblue);
+  G4VisAttributes* MylarVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
   simpleBoxVisAtt -> SetVisibility(true);
-  simpleBoxVisAtt -> SetForceWireframe(true);
-  PhantomLog -> SetVisAttributes(simpleBoxVisAtt);
-	
+	MylarVisAtt -> SetVisibility(true);
+  OuterLog -> SetVisAttributes(simpleBoxVisAtt);
+  UpperLog -> SetVisAttributes(simpleBoxVisAtt);
+  InnerLog -> SetVisAttributes(simpleBoxVisAtt);
+  AlCapLog -> SetVisAttributes(simpleBoxVisAtt);
+  MylarCapLog -> SetVisAttributes(MylarVisAtt);
+
 }
 
 void  BrachyDetectorConstruction::ConstructSensitiveDetector()
@@ -233,16 +247,19 @@ void  BrachyDetectorConstruction::ConstructSensitiveDetector()
 
   G4Colour  lgreen  (0.0, .75, 0.0);
   G4Material* air = pMaterial -> GetMat("Air") ;
-//	G4Material* water = pMaterial -> GetMat("Water");
-/*
-  //x axis
-  Detector = new G4Box("Detector", 74.5*mm,5*mm, 5*mm);
-  DetectorLog = new G4LogicalVolume(Detector, Water, "DetectorLog", 0,0,0);
-  DetectorPhys = new G4PVPlacement(0, G4ThreeVector(75.5*mm, 0, 0),"DetectorPhys",DetectorLog,PhantomPhys,false, 0);
-*/  
-  GRD = new G4Tubs("GRD", 49.95*cm, 50.05*cm, 0.5*cm, 0.*deg, 360.*deg);
-  GRDLog = new G4LogicalVolume(GRD,air,"GRDLog",0,0,0);
-  GRDPhys = new G4PVPlacement(0, G4ThreeVector(0,0,0),"GRDPhys",GRDLog,PhantomPhys,false,0);
+	G4Material* germa = pMaterial -> GetMat("Germanium");
+
+	// Boolean
+	G4Tubs *center = new G4Tubs("center", 0, 4.4*mm, 18.6*mm/2, 0.*deg, 360.*deg);
+	G4Sphere *top = new G4Sphere("top", 0, 4.4*mm, 0.*deg, 360.*deg, 0.*deg, 90.*deg);
+
+	G4UnionSolid *uni = new G4UnionSolid("center+top", center, top, 0, G4ThreeVector(0,0,18.6*mm/2));
+
+	G4Tubs *tube = new G4Tubs("tube", 0, 59.*mm/2, 36.7*mm/2, 0.*deg, 360.*deg);
+	G4SubtractionSolid *Crystal = new G4SubtractionSolid("Crystal", tube, uni, 0, G4ThreeVector(0,0,-9.05*mm));
+
+  GRDLog = new G4LogicalVolume(Crystal,germa,"GRDLog",0,0,0);
+  GRDPhys = new G4PVPlacement(0, G4ThreeVector(0,0,-36.7*mm/2-4.25*mm), GRDLog, "GRDPhys",WorldLog,false,0);
 
   // Visualization attributes of the phantom
   G4VisAttributes* simpleDetVisAtt = new G4VisAttributes(lgreen);
@@ -254,23 +271,6 @@ void  BrachyDetectorConstruction::ConstructSensitiveDetector()
   pSDManager->AddNewDetector(phantomSD);
   GRDLog->SetSensitiveDetector(phantomSD);
 
-/*  if(!phantomSD)
-  {
-    phantomSD = new BrachyPhantomSD(sensitiveDetectorName);
-    G4String ROGeometryName = "PhantomROGeometry";
-    phantomROGeometry = new BrachyPhantomROGeometry(ROGeometryName,
-                                phantomSizeX,  
-				phantomSizeY, 
-				phantomSizeZ,
-                                numberOfVoxelsAlongX,
-				numberOfVoxelsAlongY,		    
-				numberOfVoxelsAlongZ);
-    phantomROGeometry -> BuildROGeometry();
-    phantomSD -> SetROgeometry(phantomROGeometry);
-    pSDManager -> AddNewDetector(phantomSD);
-   
-    PhantomLog -> SetSensitiveDetector(phantomSD);
-  }*/
 }
 
 void BrachyDetectorConstruction::PrintDetectorParameters()
@@ -306,7 +306,6 @@ void BrachyDetectorConstruction::SetPhantomMaterial(G4String materialChoice)
   if (pttoMaterial)
   {
     phantomAbsorberMaterial = pttoMaterial;
-    PhantomLog -> SetMaterial(pttoMaterial); 
     PrintDetectorParameters();
   } 
   else

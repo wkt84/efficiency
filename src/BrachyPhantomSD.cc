@@ -62,68 +62,13 @@ void BrachyPhantomSD::Initialize(G4HCofThisEvent*)
 	edep = 0;
 }
 
-G4bool BrachyPhantomSD::ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist)
+G4bool BrachyPhantomSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
 	G4double de = aStep->GetTotalEnergyDeposit();
 	if(de <= 0)
 		return true;
 	edep += de;
 
-//  const G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
-
-/*
-  //
-  // The energy deposit of the hits is stored in histograms and ntuples
-  //
-
-  if(!ROhist)
-    return false;
-  
-  // Check the volume
-  if(aStep -> GetPreStepPoint() -> GetPhysicalVolume() -> 
-     GetName() != "PhantomPhys")
-    return false;
-
-  G4double energyDeposit = aStep -> GetTotalEnergyDeposit();
-
-  // Check that the energy deposit is not null
-  if(energyDeposit == 0.)
-    return false;
-          
-  if(energyDeposit != 0)                       
-	    {            
-	      // Read Voxel indexes: 
-	      // i is the x index, 
-	      // j is the y index
-	      // k is the z index
-	      G4int j = ROhist -> GetReplicaNumber();
-	      G4int k = ROhist -> GetReplicaNumber(1);
-	      G4int i = ROhist -> GetReplicaNumber(2);
-  
-	      G4int numberOfVoxel = 300;
-	      G4double voxelWidth = 1. *mm;
-	
-              // Retrieve the coordinates of the center of the voxel where
-              // the energy deposit is located
-	      x = ( - numberOfVoxel + 1+ 2*i )* voxelWidth/2; 
-	      y = ( - numberOfVoxel + 1+ 2*j )* voxelWidth/2;
-	      z = ( - numberOfVoxel + 1+ 2*k )* voxelWidth/2;
-
-*/	
-/*
-	      if (y < 0.8 * mm && y > -0.8 * mm)
-		{ 
-                  // Fill a 2D histogram with the energy deposit in the plane
-                  // containing the source
-		  analysis -> FillHistogramWithEnergy(x,z,energyDeposit/MeV);
-   
-                  //  Fill 1D histogram with the energy deposit 
-                  // along the axis perpendicular to the main axis of the source
-		  if (z < 0.8 * mm && z > -0.8 * mm)                
-		    analysis -> DoseDistribution(x,energyDeposit/MeV);
-		}
-#endif  
-	    }*/
 	return true;
 }
 

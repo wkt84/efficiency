@@ -54,12 +54,15 @@ public:
   G4Material* GetMat(G4String); //returns the material
 
 private:
-  G4Material* matW; 
+  G4Material* matW;
+	G4Material* matGe;
+	G4Material* matAl;
   G4Material* matplexiglass;
   G4Material* matPb;
   G4Material* matir192;
   G4Material* Titanium;
   G4Material* matAir;
+	G4Material* matMylar;
   G4Material* matH2O;
   G4Material* soft;
   G4Material* matsteel;

@@ -87,17 +87,12 @@ private:
   G4LogicalVolume*   WorldLog;     //pointer to the logical World
   G4VPhysicalVolume* WorldPhys;    //pointer to the physical World
 
-	// Phantom ... 
-	G4Tubs*              Phantom;  //pointer to solid phantom
-  G4LogicalVolume*    PhantomLog; //pointer to logic phantom
-  G4VPhysicalVolume*  PhantomPhys; //pointer to physical phantom
   G4Material*         phantomAbsorberMaterial;
 
   // detector
   G4Box*              Detector;  //pointer to solid phantom
   G4LogicalVolume*    DetectorLog; //pointer to logic phantom
   G4VPhysicalVolume*  DetectorPhys; //pointer to physical phantom
-  G4Tubs* GRD;
   G4LogicalVolume* GRDLog;
   G4VPhysicalVolume* GRDPhys;
  
@@ -115,7 +110,6 @@ private:
   BrachyMaterial* pMaterial; 
    
   G4double dimVoxel;	
-	G4double buildup;
 };
 
 #endif

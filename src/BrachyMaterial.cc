@@ -124,6 +124,16 @@ void BrachyMaterial::DefineMaterials()
   d = 19.3*g/cm3;
   matW = new G4Material("Tungsten",Z = 74.,A,d);
 
+	// Germanium
+	A = 72.63*g/mole;
+	d = 5.323*g/cm3;
+	matGe = new G4Material("Germanium", Z = 32., A, d);
+
+	// Aluminium material
+	A = 26.98*g/mole;
+	d = 2.7*g/cm3;
+	matAl = new G4Material("Alminium", Z = 13, A, d);
+
    // Perspex, plexiglass, lucite 
   d = 1.19*g/cm3;
   matplexiglass = new G4Material("Plexiglass",d,3);
@@ -155,9 +165,17 @@ void BrachyMaterial::DefineMaterials()
  
   // Air material
   d = 1.290*mg/cm3;
-  G4Material* matAir = new G4Material("Air",d,2);
+  matAir = new G4Material("Air",d,2);
   matAir->AddElement(elN,0.7);
   matAir->AddElement(elO,0.3);
+
+	// Mylar
+	d = 1.400*g/cm3;
+	G4int natoms;
+	matMylar = new G4Material("Mylar", d, 3);
+	matMylar->AddElement(elH, natoms=8);
+	matMylar->AddElement(elC, natoms=10);
+	matMylar->AddElement(elO, natoms=4);
 
   // Water
   d = 1.000*g/cm3;
