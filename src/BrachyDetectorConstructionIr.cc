@@ -87,7 +87,7 @@ void BrachyDetectorConstructionIr::ConstructIridium(G4VPhysicalVolume* mother)
                                        iridiumMat,
                                        "IridiumCoreLog");
   iridiumCorePhys = new G4PVPlacement(rotX,
-                                      G4ThreeVector(),
+                                      G4ThreeVector(0, 0, 0.25*mm),
                                       "IridiumCorePhys",
                                       iridiumCoreLog,
                                       mother,

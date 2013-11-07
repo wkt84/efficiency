@@ -80,10 +80,10 @@ void BrachyPrimaryGeneratorActionIr::GeneratePrimaries(G4Event* anEvent)
   G4double radius = 0.25*mm;
   do{
     x = (G4UniformRand()-0.5)*(radius)/0.5;
-    y = (G4UniformRand()-0.5)*(radius)/0.5;
-  }while(x*x+y*y > radius*radius);
+    z = (G4UniformRand()-0.5)*(radius)/0.5+radius;
+  }while(x*x+(z-radius)*(z-radius) > radius*radius);
  
-  z = (G4UniformRand()-0.5)*5.*mm/0.5;
+  y = (G4UniformRand()-0.5)*5.*mm/0.5;
 
   G4ThreeVector position(x,y,z);
   particleGun -> SetParticlePosition(position);

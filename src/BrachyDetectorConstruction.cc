@@ -207,23 +207,23 @@ void BrachyDetectorConstruction::ConstructPhantom()
 	// Alminium cap
 	G4Tubs* Outer = new G4Tubs("Outer", 38.3*mm, 39.3*mm, 97*mm/2, 0.*deg, 360.*deg);
 	G4LogicalVolume *OuterLog = new G4LogicalVolume(Outer, Al, "OuterLog", 0, 0, 0);
-	G4VPhysicalVolume *OuterPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -49.5*mm-0.25*mm), OuterLog, "OuterPhys", WorldLog, false, 0);
+	G4VPhysicalVolume *OuterPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -49.5*mm), OuterLog, "OuterPhys", WorldLog, false, 0);
 
 	G4Tubs* Upper = new G4Tubs("Upper", 0.*mm, 39.3*mm, 1.*mm/2, 0.*deg, 360.*deg);
 	G4LogicalVolume *UpperLog = new G4LogicalVolume(Upper, Al, "UpperLog", 0, 0, 0);
-	G4VPhysicalVolume *UpperPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -0.5*mm-0.25*mm), UpperLog, "UpperPhys", WorldLog, false, 0);
+	G4VPhysicalVolume *UpperPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -0.5*mm), UpperLog, "UpperPhys", WorldLog, false, 0);
 
 	G4Tubs* Inner = new G4Tubs("Inner", 32.5*mm, 33.3*mm, 47.*mm, 0.*deg, 360.*deg);
 	G4LogicalVolume *InnerLog = new G4LogicalVolume(Inner, Al, "InnerLog", 0, 0, 0);
-	G4VPhysicalVolume *InnerPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -47*mm-4.25*mm), InnerLog, "InnerPhys", WorldLog, false, 0);
+	G4VPhysicalVolume *InnerPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -47*mm-4.*mm), InnerLog, "InnerPhys", WorldLog, false, 0);
 
 	G4Tubs* AlCap = new G4Tubs("AlCap", 0.*mm, 33.3*mm, 0.03*mm/2, 0.*deg, 360.*deg);
 	G4LogicalVolume *AlCapLog = new G4LogicalVolume(AlCap, Al, "AlCapLog", 0, 0, 0);
-	G4VPhysicalVolume *AlCapPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -4.25*mm+0.045*mm),AlCapLog, "AlCapPhys", WorldLog, false, 0);
+	G4VPhysicalVolume *AlCapPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -4.*mm+0.045*mm),AlCapLog, "AlCapPhys", WorldLog, false, 0);
 
 	G4Tubs* MylarCap = new G4Tubs("MylarCap", 0.*mm, 33.3*mm, 0.03*mm/2, 0.*deg, 360.*deg);
 	G4LogicalVolume *MylarCapLog = new G4LogicalVolume(MylarCap, mylar, "MylarCapLog", 0, 0, 0);
-	G4VPhysicalVolume *MylarCapPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -4.25*mm+0.015*mm),MylarCapLog, "MylarCapPhys", WorldLog, false, 0);
+	G4VPhysicalVolume *MylarCapPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -4.*mm+0.015*mm),MylarCapLog, "MylarCapPhys", WorldLog, false, 0);
 
   WorldLog -> SetVisAttributes (G4VisAttributes::Invisible);
 
@@ -259,7 +259,7 @@ void  BrachyDetectorConstruction::ConstructSensitiveDetector()
 	G4SubtractionSolid *Crystal = new G4SubtractionSolid("Crystal", tube, uni, 0, G4ThreeVector(0,0,-9.05*mm));
 
   GRDLog = new G4LogicalVolume(Crystal,germa,"GRDLog",0,0,0);
-  GRDPhys = new G4PVPlacement(0, G4ThreeVector(0,0,-36.7*mm/2-4.25*mm), GRDLog, "GRDPhys",WorldLog,false,0);
+  GRDPhys = new G4PVPlacement(0, G4ThreeVector(0,0,-36.7*mm/2-4.*mm), GRDLog, "GRDPhys",WorldLog,false,0);
 
   // Visualization attributes of the phantom
   G4VisAttributes* simpleDetVisAtt = new G4VisAttributes(lgreen);
