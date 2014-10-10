@@ -246,18 +246,25 @@ void  BrachyDetectorConstruction::ConstructSensitiveDetector()
   G4SDManager* pSDManager = G4SDManager::GetSDMpointer();
 
   G4Colour  lgreen  (0.0, .75, 0.0);
+	G4Colour  dgreen  (0.0, .90, 0.0);
   G4Material* air = pMaterial -> GetMat("Air") ;
 	G4Material* germa = pMaterial -> GetMat("Germanium");
 
 	// r of top op Germanium
 	G4double r = 4.;
 
-	// Boolean
+	// Dead Layer of Ge-Li
+	G4double dead = 0.7;
+
+
+	// Cryo hole
 	G4Tubs *center = new G4Tubs("center", 0, 4.4*mm, 18.6*mm/2, 0.*deg, 360.*deg);
 	G4Sphere *top = new G4Sphere("top", 0, 4.4*mm, 0.*deg, 360.*deg, 0.*deg, 90.*deg);
 
 	G4UnionSolid *uni = new G4UnionSolid("center+top", center, top, 0, G4ThreeVector(0,0,18.6*mm/2));
 
+
+	// Outer Crystal
 	G4Tubs *tube = new G4Tubs("tube", 0, 59.*mm/2, (36.7-r)*mm/2, 0.*deg, 360.*deg);
 
 	G4Torus *torus = new G4Torus("torus", 0., r*mm, (59./2.-r)*mm, 0.*deg, 360.*deg);
@@ -266,16 +273,40 @@ void  BrachyDetectorConstruction::ConstructSensitiveDetector()
 	G4UnionSolid *uni2 = new G4UnionSolid("torus+toptube", toptube, torus, 0, G4ThreeVector(0,0,0));
 
 	G4UnionSolid *uni3 = new G4UnionSolid("tube+uni2", tube, uni2, 0, G4ThreeVector(0,0,(36.7-r)*mm/2));
-	G4SubtractionSolid *Crystal = new G4SubtractionSolid("Crystal", uni3, uni, 0, G4ThreeVector(0,0,-(36.7-r)*mm/2.+18.6*mm/2.));
+	G4SubtractionSolid *Crystal_Outer = new G4SubtractionSolid("Crystal_Outer", uni3, uni, 0, G4ThreeVector(0,0,-(36.7-r)*mm/2.+18.6*mm/2.));
+
+
+	// Inner Crystal
+	G4Tubs *intube = new G4Tubs("intube", 0., 59.*mm/2-dead*mm, (36.7-r)*mm/2, 0.*deg, 360.*deg);
+	G4Torus *intorus = new G4Torus("intorus", 0., (r-dead)*mm, (59./2.-r)*mm, 0.*deg, 360.*deg);
+	G4Tubs *intoptube = new G4Tubs("intoptube", 0., (59./2.-r)*mm, (r-dead)*mm, 0.*deg, 360.*deg);
+
+	G4UnionSolid *uni_in1 = new G4UnionSolid("intorus+intoptube", intoptube, intorus, 0, G4ThreeVector(0,0,0));
+	G4UnionSolid *uni_in2 = new G4UnionSolid("intube+uni_in1", intube, uni_in1, 0, G4ThreeVector(0,0,(36.7-r)*mm/2.));
+	G4SubtractionSolid *Crystal = new G4SubtractionSolid("Crystal", uni_in2, uni, 0, G4ThreeVector(0,0,-(36.7-r)*mm/2.+18.6*mm/2.));
+
+
+	// Dead Layer
+	G4SubtractionSolid *DeadLayer = new G4SubtractionSolid("DeadLayer", Crystal_Outer, Crystal, 0, G4ThreeVector(0,0,0));
+
 
   GRDLog = new G4LogicalVolume(Crystal,germa,"GRDLog",0,0,0);
   GRDPhys = new G4PVPlacement(0, G4ThreeVector(0,0,-(36.7-r)*mm/2-r*mm-4.*mm), GRDLog, "GRDPhys",WorldLog,false,0);
+
+	G4LogicalVolume *DeadLog = new G4LogicalVolume(DeadLayer, germa, "DeadLog", 0, 0, 0);
+	G4VPhysicalVolume *DeadPhys = new G4PVPlacement(0, G4ThreeVector(0, 0, -(36.7-r)*mm/2-r*mm-4.*mm), DeadLog, "DeadPhys", WorldLog, false, 0);
+
 
   // Visualization attributes of the phantom
   G4VisAttributes* simpleDetVisAtt = new G4VisAttributes(lgreen);
   simpleDetVisAtt -> SetVisibility(true);
   simpleDetVisAtt -> SetForceWireframe(true);
   GRDLog -> SetVisAttributes(simpleDetVisAtt);
+
+	G4VisAttributes* DeadVisAtt = new G4VisAttributes(dgreen);
+	DeadVisAtt -> SetVisibility(true);
+	DeadVisAtt -> SetForceWireframe(true);
+	DeadLog -> SetVisAttributes(DeadVisAtt);
 
   phantomSD = new BrachyPhantomSD(sensitiveDetectorName);
   pSDManager->AddNewDetector(phantomSD);
